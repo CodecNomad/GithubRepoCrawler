@@ -81,16 +81,17 @@ class GitHubAPI:
         try:
             path_parts = path.split("/")
             path_parts.pop(0)
-            extension_allowed = any(extension in path_parts[-1] for extension in self.allowed_extensions)
+            file_name = path_parts[-1]
 
-            if not extension_allowed:
+            # Check if the file extension is allowed
+            if not any(file_name.endswith(ext) for ext in self.allowed_extensions):
                 return ""
 
             url = f"https://raw.githubusercontent.com/{self.owner}/{self.repo}/main/{'/'.join(path_parts)}"
             response = requests.get(url)
             response.raise_for_status()
 
-            buffer = f"\n\"{url}\" starts here\n{response.text}\n\"{path_parts[-1]}\" ends here\n"
+            buffer = f"\n\"{url}\" starts here\n{response.text}\n\"{file_name}\" ends here\n"
             return buffer
         except requests.exceptions.RequestException:
             return ""
@@ -121,13 +122,11 @@ owner = "coqui-ai"
 repo = "TTS"
 
 try:
-    git = GitHubAPI(owner, repo, [".js"])
+    git = GitHubAPI(owner, repo, [".js", ".md"])
     start_time = time.time()
     code = git.scrape_code()
-
+    print(f"Scraping took {time.time() - start_time:.3f}s")
     with open("scraped.txt", "w") as file:
         file.write(code)
-
-    print(f"Scraping took {time.time() - start_time:.3f}s")
 except Exception as e:
     print(f"An error occurred: {str(e)}")
