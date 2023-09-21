@@ -1,3 +1,3 @@
 # GitHub Repository Scraper
 
-A Python script for interacting with GitHub repositories and scraping code files.
+Scrapes files filtered out and deemed to be important, great for ai dataset gathering.
