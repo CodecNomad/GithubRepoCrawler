@@ -1,13 +1,10 @@
-import requests
+import concurrent.futures
+import os
 import zipfile
 from io import BytesIO
 from typing import List, Optional
 
 import requests
-import zipfile
-from io import BytesIO
-from typing import List, Optional
-import concurrent.futures
 
 
 class GitHubAPI:
@@ -106,7 +103,7 @@ class GitHubAPI:
         file_paths = self.get_all_file_paths()
 
         # Use concurrent.futures to parallelize the scraping process
-        with concurrent.futures.ProcessPoolExecutor(max_workers=12) as executor:
+        with concurrent.futures.ProcessPoolExecutor(max_workers=os.cpu_count()) as executor:
             code_futures = [executor.submit(self._scrape_code_for_file, path) for path in file_paths]
 
             for future in concurrent.futures.as_completed(code_futures):
@@ -118,11 +115,11 @@ class GitHubAPI:
 # Example usage
 import time
 
-owner = "coqui-ai"
-repo = "TTS"
+owner = "Shell1010"
+repo = "Selfcord"
 
 try:
-    git = GitHubAPI(owner, repo, [".js", ".md"])
+    git = GitHubAPI(owner, repo)
     start_time = time.time()
     code = git.scrape_code()
     print(f"Scraping took {time.time() - start_time:.3f}s")
